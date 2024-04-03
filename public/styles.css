@@ -1,0 +1,219 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "poppins";
+  background-color: #393e46;
+}
+
+h1 {
+  margin: 0;
+  /* Remove default margin for h1 */
+  text-align: center;
+  color: #a9aaa5;
+}
+
+header {
+  font-size: 1rem;
+  width: 100vw;
+  height: 10vh;
+  background-color: #222831;
+  display: flex;
+  /* Use flexbox for layout */
+  justify-content: center;
+  /* Center horizontally */
+  align-items: center;
+  /* Center vertically */
+}
+
+.dataList {
+  margin: 0;
+  align-content: center;
+  box-sizing: border-box;
+  margin: 0 auto;
+  /* This centers the container horizontally */
+  padding: 3%;
+  width: 100vw;
+  height: 20vh;
+  float: top;
+}
+
+.controlPanel {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 3%;
+  width: 100vw;
+  height: 15vh;
+  float: bottom;
+}
+
+.graph-container {
+  margin-top: 5vh;
+  display: flex;
+  justify-content: center;
+  justify-content: space-between;
+  /* Align items with equal space between them */
+}
+
+.graph-container img {
+  width: 30%;
+  /* Adjust the width as needed */
+  height: auto;
+  margin-right: 10px;
+  /* Add some margin between images */
+}
+
+.dataList table {
+  width: 100%;
+  table-layout: fixed;
+  /* Set table layout to fixed */
+}
+
+.dataList th {
+  font-size: 2.5rem;
+  text-align: center;
+  width: 33.33%;
+  /* Divide the table width equally among the columns */
+  color: beige;
+}
+
+.dataList td {
+  padding-top: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+  width: 33.33%;
+  /* Divide the table width equally among the columns */
+  color: #f5f5dc;
+}
+
+.dataList img {
+  width: 2rem;
+  height: 2rem;
+  vertical-align: middle;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+		  supported by Chrome, Edge, Opera and Firefox */
+  display: flex;
+  /* Use flexbox for layout */
+  justify-content: center;
+  /* Center horizontally */
+  align-items: center;
+  /* Center vertically */
+}
+
+.keypadContainer {
+  /*background-color: red;*/
+  margin-left: 10px;
+  margin-top: 10px;
+  width: auto;
+  min-width: 330px;
+  padding: 0 30px;
+  box-sizing: border-box;
+  display: inline-block;
+  /* Make the inner div inline-block */
+  margin: auto;
+  /* Set auto margins to center the inner div horizontally */
+}
+
+.GpioContainer {
+  /*background-color: red;*/
+  text-align: center;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  float: left;
+  width: auto;
+  min-width: 50px;
+  padding: 5px;
+  box-sizing: border-box;
+  color: beige;
+  font-size: 1.8rem;
+}
+
+/******** Switch sliders style ******/
+
+.switch {
+  margin: 10px;
+  padding: 5px;
+  /* iOS text is not centered unless you set padding */
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+
+  -webkit-tap-highlight-color: transparent;
+  /* for removing the highlight 
+		  *This only works with certain web browser but useful for Safari and 
+		  * chrome on mobile touch screens*/
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
