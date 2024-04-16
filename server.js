@@ -12,16 +12,19 @@ const app = express();
 const server = http.createServer(app);
 
 //Assign variables to control GPIO ports
-const LED1 = new Gpio(588, "out"); //GPIO17
-const LED2 = new Gpio(593, "out"); //GPIO22
-const LED3 = new Gpio(598, "out"); //GPIO27
+//Command to see gpio naming on pi5: cat /sys/kernel/debug/gpio
+const LED1 = new Gpio(597, "out"); //GPIO26
+const LED2 = new Gpio(584, "out"); //GPIO13
+const LED3 = new Gpio(576, "out"); //GPIO05
+
 //Led state variable
-var GPIO17value = 0;
-var GPIO22value = 0;
-var GPIO27value = 0;
+var LED1State = 0;
+var LED2State = 0;
+var LED3State = 0;
 
 //Start UART/Serial port
 const UartPort = "/dev/ttyAMA0";
+//minicom -b 9600 -o -D /dev/ttyAMA0
 var Serialport = new SerialPort({
   path: UartPort,
   baudRate: 9600,
@@ -47,9 +50,9 @@ parser.on("data", (data) => {
 // Start the HTTP server
 const serverPort = 3000;
 server.listen(serverPort, function () {
-  LED1.writeSync(GPIO17value); //turn LED on or off
-  LED2.writeSync(GPIO22value); //turn LED on or off
-  LED3.writeSync(GPIO27value); //turn LED on or off
+  LED1.writeSync(LED1State); //turn LED on or off
+  LED2.writeSync(LED2State); //turn LED on or off
+  LED3.writeSync(LED3State); //turn LED on or off
 });
 
 // This code us run when server is shut down (ctrl+c on RPI)
@@ -69,32 +72,32 @@ process.on("SIGINT", function () {
 // This code is run when user connects to webpage
 io.sockets.on("connection", function (socket) {
   // Emit state of all leds to websocket
-  socket.emit("GPIO17", GPIO17value);
-  socket.emit("GPIO22", GPIO22value);
-  socket.emit("GPIO27", GPIO27value);
+  socket.emit("WindowControl", LED1State);
+  socket.emit("RadiatorControl", LED2State);
+  socket.emit("LightControl", LED3State);
 
   // This gets called whenever client presses GPIO26 toggle light button
-  socket.on("GPIO17T", function (data) {
+  socket.on("WindowToggle", function (data) {
     // If led on then turn of, and if led off turn on
-    GPIO17value = GPIO17value ? 0 : 1;
-    LED1.writeSync(GPIO17value); //turn LED on or off
-    io.emit("GPIO17", GPIO17value); //send button status to ALL clients
+    LED1State = LED1State ? 0 : 1;
+    LED1.writeSync(LED1State); //turn LED on or off
+    io.emit("WindowControl", LED1State); //send button status to ALL clients
   });
 
   // this gets called whenever client presses GPIO20 toggle light button
-  socket.on("GPIO22T", function (data) {
+  socket.on("RadiatorToggle", function (data) {
     // If led on then turn of, and if led off turn on
-    GPIO22value = GPIO22value ? 0 : 1;
-    LED2.writeSync(GPIO22value); //turn LED on or off
-    io.emit("GPIO22", GPIO22value); //send button status to ALL clients
+    LED2State = LED2State ? 0 : 1;
+    LED2.writeSync(LED2State); //turn LED on or off
+    io.emit("RadiatorControl", LED2State); //send button status to ALL clients
   });
 
   // this gets called whenever client presses GPIO21 toggle light button
-  socket.on("GPIO27T", function (data) {
+  socket.on("LightToggle", function (data) {
     // If led on then turn of, and if led off turn on
-    GPIO27value = GPIO27value ? 0 : 1;
-    LED3.writeSync(GPIO27value); //turn LED on or off
-    io.emit("GPIO27", GPIO27value); //send button status to ALL clients
+    LED3State = LED3State ? 0 : 1;
+    LED3.writeSync(LED3State); //turn LED on or off
+    io.emit("LightControl", LED3State); //send button status to ALL clients
   });
 });
 
@@ -104,7 +107,7 @@ function saveDataToFile(data) {
   const timestamp = new Date().toISOString();
 
   // Format data with timestamp
-  const formattedData = `${timestamp},Temperature:${data[0]},CO2:${data[1]},Humidity:${data[2]}\n`;
+  const formattedData = `${timestamp},Temperature:${data[0]},CO2:${data[1]},Humidity:${data[2]},People:${data[3]}\n`;
 
   // Write formatted data to log file
   fs.appendFile("uartData.log", formattedData, (err) => {
@@ -114,7 +117,7 @@ function saveDataToFile(data) {
       //console.log('Data saved to file:', formattedData);
     }
   });
-};
+}
 
 // Function to run Python script
 function runPythonScript() {
@@ -133,6 +136,15 @@ function runPythonScript() {
 }
 
 setInterval(function () {
-  saveDataToFile(latestData);
-  runPythonScript();
+  /*To prevent the server to crash in case the Arduino doesent send any data
+    We check to see if latestData variable is empty or undefined*/
+  if (latestData) {
+    saveDataToFile(latestData);
+    runPythonScript();
+  } else {
+    const timestamp = new Date().toLocaleString(); // Get current timestamp
+    console.log(
+      `[${timestamp}] : No new data available. Skipped saving data to file and creating new graphs`
+    );
+  }
 }, 60000); //Run every minute

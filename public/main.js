@@ -1,10 +1,15 @@
 const socket = io(); //load socket.io-client and connect to the host that serves the page
 
-/*-----------------Get and display sensor data-----------------*/
+socket.on("close", function () {
+  console.log("Websocket disconnected");
+});
+
 //Socket set up on string "UARTDATA"
 socket.on("UARTDATA", function (data) {
-  const dataString = JSON.parse(data); // Parse the received JSON string
-  updateUartData(dataString);
+  const recivedData = JSON.parse(data);
+  const dataToDisplay = recivedData.slice(0, 3); // Get first 3 elements of the array
+  const people = recivedData.slice(-1)[0]; // Get last element of the array
+  updateSensorData(dataToDisplay);
 });
 
 //Function to calclulate fahrenheit equvalent
@@ -21,7 +26,7 @@ function celsiusStringToFahrenheitString(celsiusString) {
 }
 
 //Function to update UART data on the webpage
-function updateUartData(dataString) {
+function updateSensorData(data) {
   //Set variable to control the table with the id "data-table"
   const table = document.getElementById("data-table");
   //Set variable to control the body of the table
@@ -34,7 +39,9 @@ function updateUartData(dataString) {
   // Insert a row to the table body
   const row = tbody.insertRow();
   // Iterate over the data and create rows in the table
-  dataString.forEach((dataItem, index) => {
+  // Slice dataString to only contain the first three elements
+
+  data.forEach((dataItem, index) => {
     // Insert a single cell for each data item and its corresponding image
     const cell = row.insertCell();
 
@@ -63,30 +70,39 @@ function updateUartData(dataString) {
   });
 }
 
-/*-----------------GPIO control-----------------*/
-
-//Update gpio feedback when server changes LED state
-socket.on("GPIO17", function (data) {
-  // parse the websocket data to a variable
-  const myJSON = JSON.stringify(data);
-  // Set the switch button to the state of the led (on or off)
-  document.getElementById("GPIO17").checked = data;
+// Listen for 'graphUpdate' event from the server
+socket.on("updateGraph", (TimeStamp) => {
+  // Update the graph image on the webpage
+  const TempGraph = document.getElementById("TempGraph");
+  const CO2Graph = document.getElementById("CO2Graph");
+  const HumidityGraph = document.getElementById("HumidityGraph");
+  TempGraph.src = "/Images/TempGraph.png?" + TimeStamp;
+  CO2Graph.src = "/Images/CO2Graph.png?" + TimeStamp;
+  HumidityGraph.src = "/Images/HumidityGraph.png?" + TimeStamp;
 });
 
 //Update gpio feedback when server changes LED state
-socket.on("GPIO22", function (data) {
+socket.on("WindowControl", function (data) {
   // parse the websocket data to a variable
   const myJSON = JSON.stringify(data);
   // Set the switch button to the state of the led (on or off)
-  document.getElementById("GPIO22").checked = data;
+  document.getElementById("Window").checked = data;
 });
 
 //Update gpio feedback when server changes LED state
-socket.on("GPIO27", function (data) {
+socket.on("RadiatorControl", function (data) {
   // parse the websocket data to a variable
   const myJSON = JSON.stringify(data);
   // Set the switch button to the state of the led (on or off)
-  document.getElementById("GPIO27").checked = data;
+  document.getElementById("Radiator").checked = data;
+});
+
+//Update gpio feedback when server changes LED state
+socket.on("LightControl", function (data) {
+  // parse the websocket data to a variable
+  const myJSON = JSON.stringify(data);
+  // Set the switch button to the state of the led (on or off)
+  document.getElementById("Light").checked = data;
 });
 
 //when page loads
@@ -106,12 +122,12 @@ function ReportMouseDown(e) {
   if (y !== null) var x = y.id;
   if (x !== null) {
     // Now we know that x is defined, we are good to go.
-    if (x === "GPIO17") {
-      socket.emit("GPIO17T"); // send GPIO button toggle to node.js server
-    } else if (x === "GPIO22") {
-      socket.emit("GPIO22T"); // send GPIO button toggle to node.js server
-    } else if (x === "GPIO27") {
-      socket.emit("GPIO27T"); // send GPIO button toggle to node.js server
+    if (x === "Window") {
+      socket.emit("WindowToggle"); // send GPIO button toggle to node.js server
+    } else if (x === "Radiator") {
+      socket.emit("RadiatorToggle"); // send GPIO button toggle to node.js server
+    } else if (x === "Light") {
+      socket.emit("LightToggle"); // send GPIO button toggle to node.js server
     }
   }
 }
@@ -121,12 +137,12 @@ function ReportTouchStart(e) {
   if (y !== null) var x = y.id;
   if (x !== null) {
     // Now we know that x is defined, we are good to go.
-    if (x === "GPIO17") {
-      socket.emit("GPIO17T"); // send GPIO button toggle to node.js server
-    } else if (x === "GPIO22") {
-      socket.emit("GPIO22T"); // send GPIO button toggle to node.js server
-    } else if (x === "GPIO27") {
-      socket.emit("GPIO27T"); // send GPIO button toggle to node.js server
+    if (x === "Window") {
+      socket.emit("WindowToggle"); // send GPIO button toggle to node.js server
+    } else if (x === "Radiator") {
+      socket.emit("RadiatorToggle"); // send GPIO button toggle to node.js server
+    } else if (x === "Light") {
+      socket.emit("LightToggle"); // send GPIO button toggle to node.js server
     }
   }
 }
@@ -148,15 +164,3 @@ var isMobile = {
     return isMobile.Android() || isMobile.iOS() || isMobile.Windows();
   },
 };
-
-
-// Listen for 'graphUpdate' event from the server
-socket.on("updateGraph", (TimeStamp) => {
-  // Update the graph image on the webpage
-  const TempGraph = document.getElementById('TempGraph');
-  const CO2Graph = document.getElementById('CO2Graph');
-  const HumidityGraph = document.getElementById('HumidityGraph');
-  TempGraph.src = "/Images/TempGraph.png?" + TimeStamp;
-  CO2Graph.src = "/Images/CO2Graph.png?" + TimeStamp;
-  HumidityGraph.src = "/Images/HumidityGraph.png?" + TimeStamp;
-});

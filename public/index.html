@@ -1,78 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- load in the favicon icon -->
+    <link rel="icon" type="image/png" href="Images/favicon.ico" />
+    <!-- load in the stylesheet -->
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <!-- load in Google font Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- load in the favicon icon -->
-  <link rel="icon" type="image/png" href="Images/favicon.ico" />
-  <!-- load in the stylesheet -->
-  <link rel="stylesheet" type="text/css" href="styles.css" />
-  <!-- load in Google font Poppins -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-    rel="stylesheet" />
-</head>
+  <body>
+    <header>
+      <h1>Home climate system</h1>
+    </header>
+    <div class="dataList">
+      <table class="table-fill" id="data-table">
+        <thead>
+          <tr>
+            <th class="text-left">Temperature</th>
+            <th class="text-left">CO2</th>
+            <th class="text-left">Humidity</th>
+          </tr>
+        </thead>
+        <tbody class="table-hover"></tbody>
+      </table>
+    </div>
+    <div class="controlPanel">
+      <div class="noselect">
+        <div class="keypadContainer">
+          <div class="GpioContainer">
+            <strong>Window</strong>
+            <br />
+            <label class="switch">
+              <input type="checkbox" id="Window" disabled />
+              <span class="slider round"></span>
+            </label>
+          </div>
 
-<body>
-  <header>
-    <h1>Home climate system</h1>
-  </header>
-  <div class="dataList">
-    <table class="table-fill" id="data-table">
-      <thead>
-        <tr>
-          <th class="text-left">Temperature</th>
-          <th class="text-left">CO2</th>
-          <th class="text-left">Humidity</th>
-        </tr>
-      </thead>
-      <tbody class="table-hover"></tbody>
-    </table>
-  </div>
-  <div class="controlPanel">
-    <div class="noselect">
-      <div class="keypadContainer">
-        <div class="GpioContainer">
-          <strong>Window</strong>
-          <br />
-          <label class="switch">
-            <input type="checkbox" id="GPIO17" disabled />
-            <span class="slider round"></span>
-          </label>
-        </div>
+          <div class="GpioContainer">
+            <strong>Radiator</strong>
+            <br />
+            <label class="switch">
+              <input type="checkbox" id="Radiator" disabled />
+              <span class="slider round"></span>
+            </label>
+          </div>
 
-        <div class="GpioContainer">
-          <strong>Heater</strong>
-          <br />
-          <label class="switch">
-            <input type="checkbox" id="GPIO22" disabled />
-            <span class="slider round"></span>
-          </label>
-        </div>
-
-        <div class="GpioContainer">
-          <strong>Lamp</strong>
-          <br />
-          <label class="switch">
-            <input type="checkbox" id="GPIO27" disabled />
-            <span class="slider round"></span>
-          </label>
+          <div class="GpioContainer">
+            <strong>Light</strong>
+            <br />
+            <label class="switch">
+              <input type="checkbox" id="Light" disabled />
+              <span class="slider round"></span>
+            </label>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="graph-container" id="graph-container">
-    <img src="/Images/TempGraph.png?" alt="Temperature Graph" id="TempGraph">
-    <img src="/Images/CO2Graph.png?" alt="CO2 Graph" id="CO2Graph">
-    <img src="/Images/HumidityGraph.png?" alt="Humidity Graph" id="HumidityGraph">
-  </div>
-  <!-- load in socket.io/Websocket -->
-  <script src="/socket.io/socket.io.js"></script>
-  <!-- load in the frontend javascript -->
-  <script src="main.js"></script>
-</body>
-
+    <div class="graph-container" id="graph-container">
+      <img
+        src="/Images/TempGraph.png?"
+        alt="Temperature Graph"
+        id="TempGraph"
+      />
+      <img src="/Images/CO2Graph.png?" alt="CO2 Graph" id="CO2Graph" />
+      <img
+        src="/Images/HumidityGraph.png?"
+        alt="Humidity Graph"
+        id="HumidityGraph"
+      />
+    </div>
+    <!-- load in socket.io/Websocket -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- load in the frontend javascript -->
+    <script src="main.js"></script>
+  </body>
 </html>
