@@ -35,7 +35,7 @@
     <div class="controlPanel">
       <div class="noselect">
         <div class="keypadContainer">
-          <div class="GpioContainer">
+          <div class="GpioContainer" id="windowContainer">
             <strong>Window</strong>
             <br />
             <label class="switch">
@@ -44,7 +44,7 @@
             </label>
           </div>
 
-          <div class="GpioContainer">
+          <div class="GpioContainer" id="radiatorContainer">
             <strong>Radiator</strong>
             <br />
             <label class="switch">
@@ -52,12 +52,21 @@
               <span class="slider round"></span>
             </label>
           </div>
-
-          <div class="GpioContainer">
+          
+          <div class="GpioContainer" id="lightContainer">
             <strong>Light</strong>
             <br />
             <label class="switch">
               <input type="checkbox" id="Light" disabled />
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="GpioContainer">
+            <strong>Automatic</strong>
+            <br />
+            <label class="switch">
+              <input type="checkbox" id="Automatic" disabled />
               <span class="slider round"></span>
             </label>
           </div>
@@ -77,6 +86,8 @@
         id="HumidityGraph"
       />
     </div>
+    <div class="center"><h2 id="people">0</h2><h2 >personer</h2></div>
+    
     <!-- load in socket.io/Websocket -->
     <script src="/socket.io/socket.io.js"></script>
     <!-- load in the frontend javascript -->

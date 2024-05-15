@@ -1,15 +1,11 @@
 const socket = io(); //load socket.io-client and connect to the host that serves the page
 
-socket.on("close", function () {
-  console.log("Websocket disconnected");
-});
-
 //Socket set up on string "UARTDATA"
 socket.on("UARTDATA", function (data) {
   const recivedData = JSON.parse(data);
   const dataToDisplay = recivedData.slice(0, 3); // Get first 3 elements of the array
   const people = recivedData.slice(-1)[0]; // Get last element of the array
-  updateSensorData(dataToDisplay);
+  updateSensorData(dataToDisplay, people);
 });
 
 //Function to calclulate fahrenheit equvalent
@@ -22,11 +18,29 @@ function celsiusStringToFahrenheitString(celsiusString) {
   const fahrenheit = (9 / 5) * celsius + 32;
 
   // Return the Fahrenheit temperature as a string with the unit
-  return `${fahrenheit.toFixed(2)} F`;
+  return `${fahrenheit.toFixed(2)} °F`;
+}
+
+function handleSensorCheck(data, people) {
+  // stateArray shall control if the window should be open, if the radiotar should be on or if the lamp should be on
+  // The format for the array is [windowState, radiatorState, lampState]
+  let stateArray = [0, 0, 0];
+
+  stateArray[0] = data[0] > 22 || data[1] > 1000 || data[2] > 60 ? 1 : 0; // Check if temperature is over 22°C or if CO2 concentration is over 1000ppm or if humidity is over 60%
+  stateArray[1] = data[0] < 20 ? 1 : 0; // Check if temperatur is under 20°C
+  stateArray[2] = people > 0 ? 1 : 0; // Check if there are any people in the room
+
+  socket.emit("SensorCheck", stateArray);
 }
 
 //Function to update UART data on the webpage
-function updateSensorData(data) {
+function updateSensorData(data, people) {
+  handleSensorCheck(data, people);
+
+  // Update website with the current amount of people in the room
+  const amountOfPeople = document.getElementById("people");
+  amountOfPeople.textContent = people;
+
   //Set variable to control the table with the id "data-table"
   const table = document.getElementById("data-table");
   //Set variable to control the body of the table
@@ -61,11 +75,17 @@ function updateSensorData(data) {
     // The first element is the temperatur element. Here we inster the Fahrenheit calculation
     if (index == 0) {
       // Insert spasing and backslash for seperation
-      cell.appendChild(document.createTextNode(" C / "));
+      cell.appendChild(document.createTextNode(" °C / "));
       // Insert the fahrenheit value
       cell.appendChild(
         document.createTextNode(celsiusStringToFahrenheitString(dataItem))
       );
+    } else if (index == 1) {
+      //Insert unit for CO2 concentration
+      cell.appendChild(document.createTextNode(" ppm"));
+    } else if (index == 2) {
+      //Insert unit for Humidity concentration
+      cell.appendChild(document.createTextNode(" %"));
     }
   });
 }
@@ -83,26 +103,42 @@ socket.on("updateGraph", (TimeStamp) => {
 
 //Update gpio feedback when server changes LED state
 socket.on("WindowControl", function (data) {
-  // parse the websocket data to a variable
-  const myJSON = JSON.stringify(data);
   // Set the switch button to the state of the led (on or off)
   document.getElementById("Window").checked = data;
 });
 
 //Update gpio feedback when server changes LED state
 socket.on("RadiatorControl", function (data) {
-  // parse the websocket data to a variable
-  const myJSON = JSON.stringify(data);
   // Set the switch button to the state of the led (on or off)
   document.getElementById("Radiator").checked = data;
 });
 
 //Update gpio feedback when server changes LED state
 socket.on("LightControl", function (data) {
-  // parse the websocket data to a variable
-  const myJSON = JSON.stringify(data);
   // Set the switch button to the state of the led (on or off)
   document.getElementById("Light").checked = data;
+});
+
+//Update gpio feedback when server changes LED state
+socket.on("AutomaticControl", function (data) {
+  // Set the switch button to the state of the led (on or off)
+  document.getElementById("Automatic").checked = data;
+
+  // If the automatic toggle is on, then we remove the manual toggle buttons for the external systems
+  const windowContainer = document.getElementById("windowContainer");
+  const radiatorContainer = document.getElementById("radiatorContainer");
+  const lightContainer = document.getElementById("lightContainer");
+
+  // We remove the buttons by adding a class that makes them invisible
+  if (data === 0) {
+    windowContainer.classList.remove("hideContainer"); // Show the container
+    radiatorContainer.classList.remove("hideContainer"); // Show the container
+    lightContainer.classList.remove("hideContainer"); // Show the container
+  } else {
+    windowContainer.classList.add("hideContainer"); // Hide the container
+    radiatorContainer.classList.add("hideContainer"); // Hide the container
+    lightContainer.classList.add("hideContainer"); // Hide the container
+  }
 });
 
 //when page loads
@@ -128,6 +164,8 @@ function ReportMouseDown(e) {
       socket.emit("RadiatorToggle"); // send GPIO button toggle to node.js server
     } else if (x === "Light") {
       socket.emit("LightToggle"); // send GPIO button toggle to node.js server
+    } else if (x === "Automatic") {
+      socket.emit("AutomaticToggle"); // send GPIO button toggle to node.js server
     }
   }
 }
@@ -143,6 +181,8 @@ function ReportTouchStart(e) {
       socket.emit("RadiatorToggle"); // send GPIO button toggle to node.js server
     } else if (x === "Light") {
       socket.emit("LightToggle"); // send GPIO button toggle to node.js server
+    } else if (x === "Automatic") {
+      socket.emit("AutomaticToggle"); // send GPIO button toggle to node.js server
     }
   }
 }

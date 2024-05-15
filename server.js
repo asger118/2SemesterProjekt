@@ -18,9 +18,10 @@ const LED2 = new Gpio(584, "out"); //GPIO13
 const LED3 = new Gpio(576, "out"); //GPIO05
 
 //Led state variable
-var LED1State = 0;
-var LED2State = 0;
-var LED3State = 0;
+let LED1State = 0;
+let LED2State = 0;
+let LED3State = 0;
+let AutomaticState = 1;
 
 //Start UART/Serial port
 const UartPort = "/dev/ttyAMA0";
@@ -75,9 +76,10 @@ io.sockets.on("connection", function (socket) {
   socket.emit("WindowControl", LED1State);
   socket.emit("RadiatorControl", LED2State);
   socket.emit("LightControl", LED3State);
+  socket.emit("AutomaticControl", AutomaticState);
 
   // This gets called whenever client presses GPIO26 toggle light button
-  socket.on("WindowToggle", function (data) {
+  socket.on("WindowToggle", function () {
     // If led on then turn of, and if led off turn on
     LED1State = LED1State ? 0 : 1;
     LED1.writeSync(LED1State); //turn LED on or off
@@ -85,7 +87,7 @@ io.sockets.on("connection", function (socket) {
   });
 
   // this gets called whenever client presses GPIO20 toggle light button
-  socket.on("RadiatorToggle", function (data) {
+  socket.on("RadiatorToggle", function () {
     // If led on then turn of, and if led off turn on
     LED2State = LED2State ? 0 : 1;
     LED2.writeSync(LED2State); //turn LED on or off
@@ -93,11 +95,35 @@ io.sockets.on("connection", function (socket) {
   });
 
   // this gets called whenever client presses GPIO21 toggle light button
-  socket.on("LightToggle", function (data) {
+  socket.on("LightToggle", function () {
     // If led on then turn of, and if led off turn on
     LED3State = LED3State ? 0 : 1;
     LED3.writeSync(LED3State); //turn LED on or off
     io.emit("LightControl", LED3State); //send button status to ALL clients
+  });
+
+  // this gets called whenever client presses GPIO20 toggle light button
+  socket.on("AutomaticToggle", function () {
+    // If led on then turn of, and if led off turn on
+    AutomaticState = AutomaticState ? 0 : 1;
+    io.emit("AutomaticControl", AutomaticState); //send button status to ALL clients
+  });
+
+  // Automatic control of external sources
+  socket.on("SensorCheck", function (stateArray) {
+    if (AutomaticState == 1) {
+      LED1State = stateArray[0];
+      LED2State = stateArray[1];
+      LED3State = stateArray[2];
+
+      LED1.writeSync(LED1State); //turn LED on or off
+      LED2.writeSync(LED2State); //turn LED on or off
+      LED3.writeSync(LED3State); //turn LED on or off
+
+      io.emit("WindowControl", LED1State); //send button status to ALL clients
+      io.emit("RadiatorControl", LED2State); //send button status to ALL clients
+      io.emit("LightControl", LED3State); //send button status to ALL clients
+    }
   });
 });
 
