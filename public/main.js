@@ -27,7 +27,7 @@ function handleSensorCheck(data, people) {
   let stateArray = [0, 0, 0];
 
   stateArray[0] = data[0] > 22 || data[1] > 1000 || data[2] > 60 ? 1 : 0; // Check if temperature is over 22°C or if CO2 concentration is over 1000ppm or if humidity is over 60%
-  stateArray[1] = data[0] < 20 ? 1 : 0; // Check if temperatur is under 20°C
+  stateArray[1] = data[0] < 20 && stateArray[0] == 0 ? 1 : 0; // Check if temperatur is under 20°C and window closed
   stateArray[2] = people > 0 ? 1 : 0; // Check if there are any people in the room
 
   socket.emit("SensorCheck", stateArray);
