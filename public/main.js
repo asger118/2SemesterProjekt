@@ -26,6 +26,7 @@ function handleSensorCheck(data, people) {
   // The format for the array is [windowState, radiatorState, lampState]
   var stateArray = [0, 0, 0];
 
+<<<<<<< HEAD
   // Check if temperature is over 22°C or if CO2 concentration is over 1000ppm or if humidity is over 60%
   stateArray[0] = data[0] > 22 || data[1] > 1000 || data[2] > 60 ? 1 : 0;
   console.log(stateArray[0]);
@@ -33,6 +34,11 @@ function handleSensorCheck(data, people) {
   stateArray[1] = data[0] < 20 && stateArray[0] == 0 ? 1 : 0;
   // Check if there are any people in the room
   stateArray[2] = people > 0 ? 1 : 0;
+=======
+  stateArray[0] = data[0] > 22 || data[1] > 1000 || data[2] > 60 ? 1 : 0; // Check if temperature is over 22°C or if CO2 concentration is over 1000ppm or if humidity is over 60%
+  stateArray[1] = data[0] < 20 && stateArray[0] == 0 ? 1 : 0; // Check if temperatur is under 20°C and window closed
+  stateArray[2] = people > 0 ? 1 : 0; // Check if there are any people in the room
+>>>>>>> 23a47223425844b4b499d9606b1a125817a6b74e
 
   // Send stateArray to backend
   socket.emit("SensorCheck", stateArray);
