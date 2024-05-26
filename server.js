@@ -13,9 +13,9 @@ const server = http.createServer(app);
 
 //Assign variables to control GPIO ports
 //Command to see gpio naming on pi5: cat /sys/kernel/debug/gpio
-const LED1 = new Gpio(597, "out"); //GPIO26
-const LED2 = new Gpio(584, "out"); //GPIO13
-const LED3 = new Gpio(576, "out"); //GPIO05
+const LED1 = new Gpio(576, "out"); //GPIO05
+const LED2 = new Gpio(597, "out"); //GPIO26
+const LED3 = new Gpio(584, "out"); //GPIO26
 
 //Led state variable
 let LED1State = 0;
@@ -78,7 +78,7 @@ io.sockets.on("connection", function (socket) {
   socket.emit("LightControl", LED3State);
   socket.emit("AutomaticControl", AutomaticState);
 
-  // This gets called whenever client presses GPIO26 toggle light button
+  // This gets called whenever client presses toggle light button
   socket.on("WindowToggle", function () {
     // If led on then turn of, and if led off turn on
     LED1State = LED1State ? 0 : 1;
@@ -86,7 +86,7 @@ io.sockets.on("connection", function (socket) {
     io.emit("WindowControl", LED1State); //send button status to ALL clients
   });
 
-  // this gets called whenever client presses GPIO20 toggle light button
+  // this gets called whenever client presses toggle light button
   socket.on("RadiatorToggle", function () {
     // If led on then turn of, and if led off turn on
     LED2State = LED2State ? 0 : 1;
@@ -94,7 +94,7 @@ io.sockets.on("connection", function (socket) {
     io.emit("RadiatorControl", LED2State); //send button status to ALL clients
   });
 
-  // this gets called whenever client presses GPIO21 toggle light button
+  // this gets called whenever client presses toggle light button
   socket.on("LightToggle", function () {
     // If led on then turn of, and if led off turn on
     LED3State = LED3State ? 0 : 1;
@@ -102,7 +102,7 @@ io.sockets.on("connection", function (socket) {
     io.emit("LightControl", LED3State); //send button status to ALL clients
   });
 
-  // this gets called whenever client presses GPIO20 toggle light button
+  // this gets called whenever client presses toggle light button
   socket.on("AutomaticToggle", function () {
     // If led on then turn of, and if led off turn on
     AutomaticState = AutomaticState ? 0 : 1;
@@ -112,9 +112,10 @@ io.sockets.on("connection", function (socket) {
   // Automatic control of external sources
   socket.on("SensorCheck", function (stateArray) {
     if (AutomaticState == 1) {
-      LED1State = stateArray[0];
-      LED2State = stateArray[1];
-      LED3State = stateArray[2];
+      //console.log(stateArray);
+      LED1State = stateArray[0]; // Window
+      LED2State = stateArray[1]; // Radiator
+      LED3State = stateArray[2]; // Light
 
       LED1.writeSync(LED1State); //turn LED on or off
       LED2.writeSync(LED2State); //turn LED on or off
